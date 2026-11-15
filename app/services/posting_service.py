@@ -14,7 +14,7 @@ class PostingService:
         async def run_single(platform: BasePlatform) -> PlatformResult:
             try:
                 return await platform.publish(message)
-            except Exception as exc:  # pragma: no cover
+            except Exception as exc:
                 return PlatformResult(
                     platform=platform.name,
                     status="failed",

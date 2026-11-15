@@ -25,10 +25,10 @@ class RedditPlatform(BasePlatform):
         if not all([self.client_id, self.client_secret, self.username, self.password]):
             return None
 
-        auth_bytes = f"{self.client_id}:{self.client_secret}".encode()
-        basic_auth = base64.b64encode(auth_bytes).decode("utf-8")
+        auth_value = f"{self.client_id}:{self.client_secret}".encode()
+        basic_auth = base64.b64encode(auth_value).decode("utf-8")
 
-        data = {
+        payload = {
             "grant_type": "password",
             "username": self.username,
             "password": self.password,
@@ -37,7 +37,7 @@ class RedditPlatform(BasePlatform):
         try:
             response = await self.client.post(
                 "https://www.reddit.com/api/v1/access_token",
-                data=data,
+                data=payload,
                 headers={
                     "User-Agent": self.user_agent,
                     "Authorization": f"Basic {basic_auth}",
@@ -45,8 +45,8 @@ class RedditPlatform(BasePlatform):
             )
             if response.status_code != 200:
                 return None
-            payload = response.json()
-            return payload.get("access_token")
+            data = response.json()
+            return data.get("access_token")
         except (httpx.HTTPError, ValueError):
             return None
 
@@ -82,8 +82,8 @@ class RedditPlatform(BasePlatform):
             if response.status_code == 200:
                 url = payload.get("json", {}).get("data", {}).get("url")
                 return self._success(posted_url=url, public_access=True)
-            errors = payload.get("json", {}).get("errors") or payload.get("message") or response.text
-            return self._failed(f"Reddit API error {response.status_code}: {errors}")
+            internal_error = payload.get("json", {}).get("errors") or payload.get("message") or response.text
+            return self._failed(f"Reddit API error {response.status_code}: {internal_error}")
         except httpx.TimeoutException:
             return self._failed("Reddit API request timed out.")
         except httpx.HTTPError as exc:

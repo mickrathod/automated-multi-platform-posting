@@ -74,3 +74,78 @@ async def test_one_platform_fails(monkeypatch):
     assert response.success is False
     assert response.failed_platforms == 1
     assert any(result.platform == "Reddit" and result.status == "failed" for result in response.results)
+
+
+@pytest.mark.asyncio
+async def test_multiple_platform_failures(monkeypatch):
+    async def fail_all(self, message):
+        return self._failed("API failure")
+
+    monkeypatch.setattr(XPlatform, "publish", fail_all)
+    monkeypatch.setattr(RedditPlatform, "publish", fail_all)
+    monkeypatch.setattr(MastodonPlatform, "publish", fail_all)
+    monkeypatch.setattr(DevToPlatform, "publish", fail_all)
+    monkeypatch.setattr(HashnodePlatform, "publish", fail_all)
+
+    service = PostingService(
+        platforms=[
+            XPlatform(settings=Settings()),
+            RedditPlatform(settings=Settings()),
+            MastodonPlatform(settings=Settings()),
+            DevToPlatform(settings=Settings()),
+            HashnodePlatform(settings=Settings()),
+        ]
+    )
+
+    response = await service.publish("hello https://example.com")
+    assert response.success is False
+    assert response.failed_platforms == 5
+    assert response.successful_platforms == 0
+
+
+@pytest.mark.asyncio
+async def test_auth_failure(monkeypatch):
+    async def fake_reddit(self, message):
+        return self._failed("Authentication failed")
+
+    monkeypatch.setattr(RedditPlatform, "publish", fake_reddit)
+    service = PostingService(platforms=[RedditPlatform(settings=Settings())])
+    response = await service.publish("hello https://example.com")
+    assert response.success is False
+    assert any(result.error and "Authentication failed" in result.error for result in response.results)
+
+
+@pytest.mark.asyncio
+async def test_network_timeout(monkeypatch):
+    async def fake_timeout(self, message):
+        return self._failed("X API request timed out.")
+
+    monkeypatch.setattr(XPlatform, "publish", fake_timeout)
+    service = PostingService(platforms=[XPlatform(settings=Settings(X_ACCESS_TOKEN="token"))])
+    response = await service.publish("hello https://example.com")
+    assert response.success is False
+    assert response.failed_platforms == 1
+
+
+@pytest.mark.asyncio
+async def test_missing_api_credentials(monkeypatch):
+    async def fake_missing(self, message):
+        return self._failed("X API credentials are missing. Configure X_ACCESS_TOKEN.")
+
+    monkeypatch.setattr(XPlatform, "publish", fake_missing)
+    service = PostingService(platforms=[XPlatform(settings=Settings())])
+    response = await service.publish("hello https://example.com")
+    assert response.success is False
+    assert any(result.platform == "X" and result.status == "failed" for result in response.results)
+
+
+@pytest.mark.asyncio
+async def test_unexpected_api_response(monkeypatch):
+    async def fake_bad(self, message):
+        return self._failed("Unexpected X API response format.")
+
+    monkeypatch.setattr(XPlatform, "publish", fake_bad)
+    service = PostingService(platforms=[XPlatform(settings=Settings(X_ACCESS_TOKEN="token"))])
+    response = await service.publish("hello https://example.com")
+    assert response.success is False
+    assert any(result.error and "unexpected" in result.error.lower() for result in response.results)

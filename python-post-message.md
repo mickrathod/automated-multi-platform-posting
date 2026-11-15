@@ -159,13 +159,13 @@ automated-posting/
 Once you complete the practical test:
 
 1. Upload your complete source code to GitHub.
-2. Make your GitHub repository **Public**.
-3. Include a `README.md` with setup and execution instructions.
+2. Make your GitHub repository Public.
+3. Include a README.md with setup and execution instructions.
 4. Include sample API requests and responses.
 5. Add screenshots or logs demonstrating your implementation.
 6. Ensure no API keys, passwords, or private credentials are committed.
 
-**Time Limit: Maximum 4 Hours.**
+Time Limit: Maximum 4 Hours.
 
 ## 8. Final Submission – Email Instructions
 
@@ -179,34 +179,20 @@ After completing the practical test, send an email to:
 
 Please include the following details:
 
-1. **Your Full Name:**
-2. **GitHub Repository Link:** Public repository link so our team can review your source code.
-3. **Contact Number:**
-4. **Current Location:** City and State.
-5. **Best Time to Discuss:** Your preferred date and time for the final-round discussion.
+1. Your Full Name:
+2. GitHub Repository Link:
+3. Contact Number:
+4. Current Location:
+5. Best Time to Discuss:
 
 ## 9. Submission Deadline
 
-**Final Submission Date: 22nd November 2026**
-
-Applicants must complete the practical test and submit their public GitHub repository link by **22nd November 2026**.
-
-Late submissions may not be considered for the review process.
+Final Submission Date: 22nd November 2026
 
 ## 10. Final Round – Dxora Panel Interview
 
-After reviewing your GitHub repository, our team will evaluate your practical implementation.
-
-Shortlisted applicants will be contacted for the final technical discussion with the **Dxora Panel**.
-
-We will review your:
-
-- Python programming skills.
-- FastAPI and REST API knowledge.
-- Third-party API research and integration.
-- Problem-solving approach.
-- Code structure and implementation decisions.
+Shortlisted applicants will be contacted for the final technical discussion with the Dxora Panel.
 
 ---
 
-**All the best! We look forward to reviewing your work.**
+All the best!

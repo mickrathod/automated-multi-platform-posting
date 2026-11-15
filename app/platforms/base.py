@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
 import datetime as dt
+from abc import ABC, abstractmethod
 
 import httpx
 
@@ -18,13 +18,9 @@ class BasePlatform(ABC):
 
     @abstractmethod
     async def publish(self, message: str) -> PlatformResult:
-        """Publish a message to the platform."""
+        raise NotImplementedError
 
-    def _success(
-        self,
-        posted_url: str | None = None,
-        public_access: bool = True,
-    ) -> PlatformResult:
+    def _success(self, posted_url: str | None = None, public_access: bool = True) -> PlatformResult:
         now_utc = dt.datetime.now(dt.timezone.utc)
         return PlatformResult(
             platform=self.name,

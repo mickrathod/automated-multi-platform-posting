@@ -8,7 +8,7 @@ URL_PATTERN = r"https?://[^\s]+"
 
 
 class PostingRequest(BaseModel):
-    message: str = Field(..., description="The message to publish with exactly one CTA URL.")
+    message: str = Field(..., description="Message to publish with exactly one CTA URL.")
 
     @field_validator("message")
     @classmethod
@@ -29,15 +29,14 @@ class PostingRequest(BaseModel):
         if len(matches) != 1:
             raise ValueError("Message must contain exactly one valid HTTP or HTTPS URL.")
 
-        url = matches[0].strip()
-        parsed = urlparse(url)
+        parsed = urlparse(matches[0].strip())
         if parsed.scheme not in {"http", "https"} or not parsed.netloc:
             raise ValueError("URL must be a valid HTTP or HTTPS URL.")
 
         return normalized
 
     @model_validator(mode="after")
-    def ensure_exactly_one_url(self):
+    def ensure_single_url(self):
         import re
         from urllib.parse import urlparse
 
@@ -46,8 +45,7 @@ class PostingRequest(BaseModel):
         if len(matches) != 1:
             raise ValueError("Message must contain exactly one valid HTTP or HTTPS URL.")
 
-        url = matches[0].strip()
-        parsed = urlparse(url)
+        parsed = urlparse(matches[0].strip())
         if parsed.scheme not in {"http", "https"} or not parsed.netloc:
             raise ValueError("URL must be a valid HTTP or HTTPS URL.")
 

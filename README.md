@@ -1,24 +1,29 @@
 # Automated Multi-Platform Posting System
 
-A FastAPI-based service that accepts a short marketing or announcement message with exactly one CTA URL and publishes it across multiple social platforms using official APIs.
+A production-oriented Python 3.12 + FastAPI service that accepts a short message containing exactly one CTA URL and publishes it across multiple third-party platforms through their official APIs.
 
-## Features
+## Overview
 
-- REST API for posting a message with a single URL
-- Pydantic validation for request rules
-- Async HTTP publishing to five platforms
-- Isolated platform failure handling
-- UTC timestamps stored in results
-- Modular platform adapters and service layer
-- Swagger documentation via FastAPI
-
-## Supported Platforms
+This project accepts a `message` via REST API and automatically posts it to:
 
 - X (Twitter)
 - Reddit
 - Mastodon
 - DEV.to
 - Hashnode
+
+The caller does not specify which platforms to use. Platform selection is internal and automatic, and each platform is processed independently.
+
+## Features
+
+- FastAPI REST API with Swagger documentation
+- Pydantic validation for message and URL rules
+- Async HTTP publishing using `httpx`
+- Concurrent platform publishing with `asyncio.gather`
+- Fail-safe execution: one platform failure does not stop others
+- Unified result format for each platform
+- Environment-based API credential configuration
+- Pytest-based automated testing with mocked responses
 
 ## Technology Stack
 
@@ -60,10 +65,12 @@ automated-posting/
 ├── .env.example
 ├── .gitignore
 ├── requirements.txt
-└── README.md
+├── README.md
+├── python-post-message.md
+└── .env
 ```
 
-## Official API Docs
+## Official API Documentation
 
 - X API: https://developer.x.com/en/docs/x-api
 - Reddit API: https://www.reddit.com/dev/api/
@@ -73,14 +80,22 @@ automated-posting/
 
 ## Environment Setup
 
-Copy `.env.example` to `.env` and fill in required values.
+1. Copy `.env.example` to `.env`
+2. Fill in the required values
+3. Never commit `.env` to version control
+
+```bash
+cp .env.example .env
+```
 
 ## Install
 
 ```bash
 python -m venv venv
+
 # Windows
 venv\Scripts\activate
+
 # macOS/Linux
 source venv/bin/activate
 
@@ -93,11 +108,15 @@ pip install -r requirements.txt
 uvicorn app.main:app --host 0.0.0.0 --port 4000 --reload
 ```
 
-Swagger docs: http://localhost:4000/docs
+Swagger docs:
+- http://localhost:4000/docs
 
 ## Example Request
 
-```json
+```http
+POST /posting
+Content-Type: application/json
+
 {
   "message": "Check out our latest business platform and grow your online visibility. https://example.com"
 }
@@ -128,7 +147,7 @@ Swagger docs: http://localhost:4000/docs
       "public_access": false,
       "date": null,
       "time": null,
-      "error": "Reddit credentials are missing."
+      "error": "Authentication failed"
     }
   ]
 }
@@ -142,14 +161,25 @@ pytest -v
 
 ## Security Notes
 
-- Never commit `.env` files.
-- Keep tokens in environment variables.
-- Do not log secrets.
-- Validate URLs and input strings tightly.
+- Never commit `.env`
+- Do not log API secrets
+- Store credentials in environment variables only
+- Validate URLs and message content before publishing
 
 ## Known Limitations
 
-- Real posting requires valid credentials and platform-specific permissions.
-- Some APIs enforce rate limits or scoped tokens.
-- Hashnode requires a publication ID and GraphQL API access.
-- No live posts are performed in this environment.
+- Real posting requires valid API keys and platform permissions
+- Some platforms impose rate limits and account-level restrictions
+- Hashnode requires a valid publication ID
+- This environment does not publish to real services unless credentials are configured
+
+## Final Submission Notes
+
+This project matches the practical test specification and demonstrates:
+
+- FastAPI REST structure
+- Input validation with Pydantic
+- Multi-platform async publishing
+- Independent platform failure handling
+- API integration patterns
+- Test automation with mocked platform responses

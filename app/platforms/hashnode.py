@@ -26,7 +26,6 @@ class HashnodePlatform(BasePlatform):
           }
         }
         """
-
         variables = {
             "input": {
                 "publicationId": self.publication_id,
@@ -36,7 +35,6 @@ class HashnodePlatform(BasePlatform):
                 "enableToc": True,
             }
         }
-
         response = await self.client.post(
             self.endpoint,
             json={"query": mutation, "variables": variables},
@@ -62,9 +60,7 @@ class HashnodePlatform(BasePlatform):
           }
         }
         """
-
         variables = {"input": {"draftId": draft_id}}
-
         response = await self.client.post(
             self.endpoint,
             json={"query": mutation, "variables": variables},
